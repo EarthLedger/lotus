@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"os"
 	"github.com/filecoin-project/lotus/api/v1api"
 
 	proof2 "github.com/filecoin-project/specs-actors/v2/actors/runtime/proof"
@@ -146,7 +147,12 @@ func (m *Miner) Start(_ context.Context) error {
 		return fmt.Errorf("miner already started")
 	}
 	m.stop = make(chan struct{})
-	go m.mine(context.TODO())
+	if _, ok := os.LookupEnv("LOTUS_WINNING_POST"); ok {
+		log.Warnf("This miner will minning block")
+		go m.mine(context.TODO())
+	} else {
+		log.Warnf("This miner will be disabled minning block")
+	}
 	return nil
 }
 
